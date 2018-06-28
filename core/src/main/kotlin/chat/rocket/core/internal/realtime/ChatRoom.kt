@@ -2,11 +2,11 @@ package chat.rocket.core.internal.realtime
 
 import chat.rocket.common.RocketChatAuthException
 import chat.rocket.core.RocketChatClient
-import chat.rocket.core.internal.realtime.message.createDirectMessage
-import chat.rocket.core.internal.realtime.message.roomsStreamMessage
-import chat.rocket.core.internal.realtime.message.streamRoomMessages
-import chat.rocket.core.internal.realtime.message.streamTypingMessage
-import chat.rocket.core.internal.realtime.message.typingMessage
+import chat.rocket.core.internal.realtime.message.*
+import chat.rocket.core.internal.realtime.socket.callMethod
+import chat.rocket.core.internal.realtime.socket.model.RoomHistory
+import chat.rocket.core.internal.realtime.socket.MethodCallback
+import chat.rocket.core.model.Message
 import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.withContext
 
@@ -45,7 +45,20 @@ fun RocketChatClient.subscribeRoomMessages(roomId: String, callback: (Boolean, S
     }
 }
 
+
 suspend fun RocketChatClient.createDirectMessage(username: String) =
     withContext(CommonPool) {
         socket.send(createDirectMessage(socket.generateId(), username))
     }
+
+fun RocketChatClient.roomHistory(roomId: String, limit: Int, callback: MethodCallback<RoomHistory>) {
+    val adapter = moshi.adapter<RoomHistory>(RoomHistory::class.java)
+    val id = socket.generateId()
+    callMethod(id, roomHistoryMethod(id, roomId, limit), adapter, callback)
+}
+
+fun RocketChatClient.sendMessage(messageId: String, roomId: String, text: String, callback: MethodCallback<Message>) {
+    val adapter = moshi.adapter(Message::class.java)
+    val id = socket.generateId()
+    callMethod(id, sendMessageMethod(id, messageId, roomId, text), adapter, callback)
+}

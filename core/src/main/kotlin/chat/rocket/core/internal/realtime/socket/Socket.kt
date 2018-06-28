@@ -68,6 +68,7 @@ class Socket(
     private val currentId = AtomicInteger(1)
 
     internal val subscriptionsMap = HashMap<String, (Boolean, String) -> Unit>()
+    internal val methodsMap = HashMap<String, MethodCallback<String>>()
 
     private val reconnectionStrategy =
         ReconnectionStrategy(Int.MAX_VALUE, 3000)
@@ -226,8 +227,16 @@ class Socket(
             MessageType.READY -> {
                 processSubscriptionResult(text)
             }
+            MessageType.RESULT -> {
+                if (methodsMap.containsKey(message.id)) {
+                    processMethodResult(text)
+                }
+            }
             MessageType.ERROR -> {
                 logger.info { "Error: ${message.errorReason}" }
+                if (methodsMap.containsKey(message.id)) {
+                    methodsMap.remove(message.id)?.error(message.errorReason ?: "Unknown")
+                }
             }
             else -> {
                 logger.debug { "Ignoring message type: ${message.type}" }
