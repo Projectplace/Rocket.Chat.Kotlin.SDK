@@ -52,7 +52,7 @@ suspend fun RocketChatClient.createDirectMessage(username: String) =
     }
 
 fun RocketChatClient.roomHistory(roomId: String, limit: Int, callback: MethodCallback<RoomHistory>) {
-    val adapter = moshi.adapter<RoomHistory>(RoomHistory::class.java)
+    val adapter = moshi.adapter(RoomHistory::class.java)
     val id = socket.generateId()
     callMethod(id, roomHistoryMethod(id, roomId, limit), adapter, callback)
 }
@@ -61,4 +61,9 @@ fun RocketChatClient.sendMessage(messageId: String, roomId: String, text: String
     val adapter = moshi.adapter(Message::class.java)
     val id = socket.generateId()
     callMethod(id, sendMessageMethod(id, messageId, roomId, text), adapter, callback)
+}
+
+fun RocketChatClient.markRoomAsRead(roomId: String) {
+    val id = socket.generateId()
+    callMethod<Unit>(id, markRoomAsReadMethod(id, roomId))
 }

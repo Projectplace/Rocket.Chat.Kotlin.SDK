@@ -40,3 +40,6 @@ internal fun roomHistoryMethod(id: String, roomId: String, limit: Int): String =
 
 internal fun sendMessageMethod(id: String, messageId: String, roomId: String, text: String): String =
         newMessage("sendMessage", id, "{\"_id\":\"$messageId\", \"rid\":\"$roomId\", \"msg\":\"$text\"}")
+
+internal fun markRoomAsReadMethod(id: String, roomId: String): String =
+        newMessage("readMessages", id, "\"$roomId\"")
