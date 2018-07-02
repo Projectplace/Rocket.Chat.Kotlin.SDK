@@ -5,7 +5,7 @@ import chat.rocket.core.RocketChatClient
 import chat.rocket.core.internal.model.Subscription
 import chat.rocket.core.internal.realtime.message.*
 import chat.rocket.core.internal.realtime.socket.MethodCallback
-import chat.rocket.core.internal.realtime.socket.callMethod
+import chat.rocket.core.internal.realtime.socket.callTypedMethod
 import chat.rocket.core.model.Room
 import com.squareup.moshi.Types
 import kotlinx.coroutines.experimental.CommonPool
@@ -47,11 +47,11 @@ fun RocketChatClient.subscribeActiveUsers(callback: (Boolean, String) -> Unit): 
 fun RocketChatClient.subscriptions(callback: MethodCallback<List<Subscription>>) {
     val adapter = moshi.adapter<List<Subscription>>(Types.newParameterizedType(List::class.java, Subscription::class.java))
     val id = socket.generateId()
-    callMethod(id, subscriptionsMethod(id), adapter, callback)
+    callTypedMethod(id, subscriptionsMethod(id), adapter, callback)
 }
 
 fun RocketChatClient.rooms(callback: MethodCallback<List<Room>>) {
     val adapter = moshi.adapter<List<Room>>(Types.newParameterizedType(List::class.java, Room::class.java))
     val id = socket.generateId()
-    callMethod(id, roomsMethod(id), adapter, callback)
+    callTypedMethod(id, roomsMethod(id), adapter, callback)
 }

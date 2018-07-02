@@ -3,6 +3,7 @@ package chat.rocket.core.internal.realtime
 import chat.rocket.common.RocketChatAuthException
 import chat.rocket.core.RocketChatClient
 import chat.rocket.core.internal.realtime.message.*
+import chat.rocket.core.internal.realtime.socket.callTypedMethod
 import chat.rocket.core.internal.realtime.socket.callMethod
 import chat.rocket.core.internal.realtime.socket.model.RoomHistory
 import chat.rocket.core.internal.realtime.socket.MethodCallback
@@ -54,16 +55,16 @@ suspend fun RocketChatClient.createDirectMessage(username: String) =
 fun RocketChatClient.roomHistory(roomId: String, limit: Int, callback: MethodCallback<RoomHistory>) {
     val adapter = moshi.adapter(RoomHistory::class.java)
     val id = socket.generateId()
-    callMethod(id, roomHistoryMethod(id, roomId, limit), adapter, callback)
+    callTypedMethod(id, roomHistoryMethod(id, roomId, limit), adapter, callback)
 }
 
 fun RocketChatClient.sendMessage(messageId: String, roomId: String, text: String, callback: MethodCallback<Message>) {
     val adapter = moshi.adapter(Message::class.java)
     val id = socket.generateId()
-    callMethod(id, sendMessageMethod(id, messageId, roomId, text), adapter, callback)
+    callTypedMethod(id, sendMessageMethod(id, messageId, roomId, text), adapter, callback)
 }
 
 fun RocketChatClient.markRoomAsRead(roomId: String) {
     val id = socket.generateId()
-    callMethod<Unit>(id, markRoomAsReadMethod(id, roomId))
+    callMethod(id, markRoomAsReadMethod(id, roomId))
 }

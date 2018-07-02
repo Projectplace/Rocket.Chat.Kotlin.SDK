@@ -11,43 +11,46 @@ interface MethodCallback<T> {
 }
 
 internal fun Socket.processMethodResult(text: String) {
-    val id: String
-    var result = ""
     try {
         val json = JSONObject(text)
-        id = json.getString("id")
+        val id = json.getString("id")
         if (json.has("result")) {
-            result = json.getString("result")
+            methodsMap.remove(id)?.success(json.getString("result"))
+        } else if (json.has("error")) {
+            methodsMap.remove(id)?.error(json.getString("error"))
         }
     } catch (ex: Exception) {
         ex.printStackTrace()
-        return
     }
-
-    methodsMap.remove(id)?.success(result)
 }
 
-internal fun <T> RocketChatClient.callMethod(id: String, method: String, resultAdapter: JsonAdapter<T>? = null, callback: MethodCallback<T>? = null) {
+internal fun <T> RocketChatClient.callTypedMethod(id: String, method: String, resultAdapter: JsonAdapter<T>, callback: MethodCallback<T>) {
+    callMethod(id, method, object : MethodCallback<String> {
+        override fun success(result: String) {
+            try {
+                val jsonResult = resultAdapter.fromJson(result)
+                jsonResult?.apply {
+                    launch(parent = socket.parentJob) {
+                        callback.success(jsonResult)
+                    }
+                }
+            } catch (ex: Exception) {
+                ex.printStackTrace()
+                callback.error(ex.localizedMessage)
+            }
+        }
+
+        override fun error(reason: String) {
+            callback.error(reason)
+        }
+    })
+}
+
+internal fun RocketChatClient.callMethod(id: String, method: String, callback: MethodCallback<String>? = null) {
     with(socket) {
         send(method)
-        methodsMap[id] = object : MethodCallback<String> {
-            override fun success(result: String) {
-                try {
-                    val jsonResult = resultAdapter?.fromJson(result)
-                    jsonResult?.apply {
-                        launch(parent = parentJob) {
-                            callback?.success(jsonResult)
-                        }
-                    }
-                } catch (ex: Exception) {
-                    ex.printStackTrace()
-                    callback?.error(ex.localizedMessage)
-                }
-            }
-
-            override fun error(reason: String) {
-                callback?.error(reason)
-            }
+        callback?.apply {
+            methodsMap[id] = this
         }
     }
 }

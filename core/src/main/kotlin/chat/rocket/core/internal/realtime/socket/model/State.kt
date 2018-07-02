@@ -7,5 +7,5 @@ sealed class State {
     class Authenticating : State()
     class Connected : State()
     class Disconnecting : State()
-    class Disconnected : State()
+    class Disconnected(val code: Int? = null, val reason: String? = null) : State()
 }

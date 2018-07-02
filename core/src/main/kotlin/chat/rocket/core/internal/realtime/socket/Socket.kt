@@ -93,13 +93,13 @@ class Socket(
         socket = httpClient.newWebSocket(request, this)
     }
 
-    internal fun disconnect() {
+    internal fun disconnect(code: Int, reason: String) {
         when (currentState) {
             State.Disconnected() -> return
             else -> {
                 logger.debug { "SELF DISCONNECT" }
                 selfDisconnect = true
-                socket?.close(1002, "Bye bye!!")
+                socket?.close(code, reason)
                 pingJob?.cancel()
                 timeoutJob?.cancel()
                 reconnectJob?.cancel()
@@ -196,9 +196,9 @@ class Socket(
         when (message.type) {
             MessageType.ADDED, MessageType.UPDATED -> {
                 // FIXME - for now just set the state to connected
-                setState(State.Connected())
+                //setState(State.Connected())
             }
-            MessageType.RESULT -> {
+            MessageType.RESULT -> {8
                 processLoginResult(text)
             }
             MessageType.PING -> {
@@ -353,7 +353,7 @@ class Socket(
     }
 
     override fun onClosed(webSocket: WebSocket, code: Int, reason: String?) {
-        setState(State.Disconnected())
+        setState(State.Disconnected(code, reason))
         close()
         startReconnection()
     }
@@ -364,5 +364,5 @@ fun RocketChatClient.connect() {
 }
 
 fun RocketChatClient.disconnect() {
-    socket.disconnect()
+    socket.disconnect(1000, "Bye bye!!")
 }

@@ -6,6 +6,7 @@ import chat.rocket.core.internal.realtime.socket.model.State
 import chat.rocket.core.internal.model.TypedResponse
 import chat.rocket.core.internal.realtime.message.loginMethod
 import com.squareup.moshi.Types
+import org.json.JSONObject
 
 fun Socket.login(token: Token?) {
     token?.let { authToken ->
@@ -28,5 +29,14 @@ internal fun Socket.processLoginResult(text: String) {
         setState(State.Connected())
     } catch (ex: Exception) {
         ex.printStackTrace()
+        var reason = ex.localizedMessage
+        try {
+            val jsonObject = JSONObject(text)
+            if (jsonObject.has("error")) {
+                reason = jsonObject.getJSONObject("error").getString("error")
+            }
+        } finally {
+            disconnect(1002, reason)
+        }
     }
 }
