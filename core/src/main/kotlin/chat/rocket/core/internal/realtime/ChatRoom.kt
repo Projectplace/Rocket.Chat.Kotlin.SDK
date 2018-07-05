@@ -10,6 +10,7 @@ import chat.rocket.core.internal.realtime.socket.MethodCallback
 import chat.rocket.core.model.Message
 import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.withContext
+import org.json.JSONObject
 
 suspend fun RocketChatClient.setTypingStatus(roomId: String, username: String, isTyping: Boolean) =
     withContext(CommonPool) {
@@ -46,11 +47,19 @@ fun RocketChatClient.subscribeRoomMessages(roomId: String, callback: (Boolean, S
     }
 }
 
+fun RocketChatClient.createDirectMessage(username: String, callback: MethodCallback<String>? = null) {
+    val id = socket.generateId()
+    callMethod(id, createDirectMessage(id, username), object : MethodCallback<String> {
+        override fun success(result: String) {
+            val jsonObject = JSONObject(result)
+            callback?.success(jsonObject.getString("rid"))
+        }
 
-suspend fun RocketChatClient.createDirectMessage(username: String) =
-    withContext(CommonPool) {
-        socket.send(createDirectMessage(socket.generateId(), username))
-    }
+        override fun error(reason: String) {
+            callback?.error(reason)
+        }
+    })
+}
 
 fun RocketChatClient.roomHistory(roomId: String, limit: Int, callback: MethodCallback<RoomHistory>) {
     val adapter = moshi.adapter(RoomHistory::class.java)
