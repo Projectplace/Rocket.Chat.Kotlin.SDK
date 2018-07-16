@@ -198,7 +198,7 @@ class Socket(
                 // FIXME - for now just set the state to connected
                 //setState(State.Connected())
             }
-            MessageType.RESULT -> {8
+            MessageType.RESULT -> {
                 processLoginResult(text)
             }
             MessageType.PING -> {
