@@ -43,3 +43,6 @@ internal fun sendMessageMethod(id: String, messageId: String, roomId: String, te
 
 internal fun markRoomAsReadMethod(id: String, roomId: String): String =
         newMessage("readMessages", id, "\"$roomId\"")
+
+internal fun hideRoomMethod(id: String, roomId: String): String =
+        newMessage("hideRoom", id, "\"$roomId\"")

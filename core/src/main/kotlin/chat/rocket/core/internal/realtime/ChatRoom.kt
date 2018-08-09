@@ -3,10 +3,10 @@ package chat.rocket.core.internal.realtime
 import chat.rocket.common.RocketChatAuthException
 import chat.rocket.core.RocketChatClient
 import chat.rocket.core.internal.realtime.message.*
-import chat.rocket.core.internal.realtime.socket.callTypedMethod
-import chat.rocket.core.internal.realtime.socket.callMethod
-import chat.rocket.core.internal.realtime.socket.model.RoomHistory
 import chat.rocket.core.internal.realtime.socket.MethodCallback
+import chat.rocket.core.internal.realtime.socket.callMethod
+import chat.rocket.core.internal.realtime.socket.callTypedMethod
+import chat.rocket.core.internal.realtime.socket.model.RoomHistory
 import chat.rocket.core.model.Message
 import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.withContext
@@ -76,4 +76,21 @@ fun RocketChatClient.sendMessage(messageId: String, roomId: String, text: String
 fun RocketChatClient.markRoomAsRead(roomId: String) {
     val id = socket.generateId()
     callMethod(id, markRoomAsReadMethod(id, roomId))
+}
+
+fun RocketChatClient.hideRoom(roomId: String, callback: MethodCallback<Unit>? = null) {
+    val id = socket.generateId()
+    callMethod(id, hideRoomMethod(id, roomId), object : MethodCallback<String> {
+        override fun success(result: String) {
+            if (result != "0") {
+                callback?.success(Unit)
+            } else {
+                callback?.error("Failed to hide room")
+            }
+        }
+
+        override fun error(reason: String) {
+            callback?.error(reason)
+        }
+    })
 }
