@@ -11,6 +11,7 @@ import chat.rocket.core.internal.realtime.socket.message.model.SocketMessage
 import chat.rocket.core.internal.realtime.socket.model.ReconnectionStrategy
 import chat.rocket.core.internal.realtime.socket.model.State
 import chat.rocket.core.internal.realtime.socket.model.StreamMessage
+import chat.rocket.core.internal.realtime.socket.model.NotifyRoomTyping
 import chat.rocket.core.model.Message
 import chat.rocket.core.model.Myself
 import chat.rocket.core.model.Room
@@ -38,7 +39,7 @@ class Socket(
     internal val messagesChannel: SendChannel<Message>,
     internal val userDataChannel: SendChannel<Myself>,
     internal val activeUsersChannel: SendChannel<User>,
-    internal val typingStatusChannel: SendChannel<Pair<String, Boolean>>
+    internal val typingStatusChannel: SendChannel<NotifyRoomTyping>
 ) : WebSocketListener() {
 
     private val request: Request = Request.Builder()

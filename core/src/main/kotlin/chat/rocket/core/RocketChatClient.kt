@@ -20,6 +20,7 @@ import chat.rocket.core.internal.model.Subscription
 import chat.rocket.core.internal.realtime.socket.Socket
 import chat.rocket.core.internal.realtime.socket.model.State
 import chat.rocket.core.internal.realtime.socket.model.StreamMessage
+import chat.rocket.core.internal.realtime.socket.model.NotifyRoomTyping
 import chat.rocket.core.model.Message
 import chat.rocket.core.model.Myself
 import chat.rocket.core.model.Room
@@ -60,7 +61,7 @@ class RocketChatClient private constructor(
     val messagesChannel = Channel<Message>()
     val userDataChannel = Channel<Myself>()
     val activeUsersChannel = Channel<User>()
-    val typingStatusChannel = Channel<Pair<String, Boolean>>()
+    val typingStatusChannel = Channel<NotifyRoomTyping>()
     internal val socket: Socket
 
     init {
