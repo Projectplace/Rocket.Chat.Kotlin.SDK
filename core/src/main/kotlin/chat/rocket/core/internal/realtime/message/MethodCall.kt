@@ -35,8 +35,8 @@ internal fun subscriptionsMethod(id: String): String =
 internal fun roomsMethod(id: String): String =
         newMessage("rooms/get", id, "")
 
-internal fun roomHistoryMethod(id: String, roomId: String, limit: Int): String =
-        newMessage("loadHistory", id, "\"$roomId\", null, $limit")
+internal fun roomHistoryMethod(id: String, roomId: String, latestTime: Long, limit: Int): String =
+        newMessage("loadHistory", id, "\"$roomId\", { \"\$date\": $latestTime }, $limit")
 
 internal fun sendMessageMethod(id: String, messageId: String, roomId: String, text: String, fields: String? = null): String =
         newMessage("sendMessage", id, "{\"_id\":\"$messageId\", \"rid\":\"$roomId\", \"msg\":\"$text\", \"fields\":$fields}")

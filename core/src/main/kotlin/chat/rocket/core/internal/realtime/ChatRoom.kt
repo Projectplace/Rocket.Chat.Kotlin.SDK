@@ -61,10 +61,10 @@ fun RocketChatClient.createDirectMessage(username: String, callback: MethodCallb
     })
 }
 
-fun RocketChatClient.roomHistory(roomId: String, limit: Int, callback: MethodCallback<RoomHistory>) {
+fun RocketChatClient.roomHistory(roomId: String, latestTime: Long, limit: Int, callback: MethodCallback<RoomHistory>) {
     val adapter = moshi.adapter(RoomHistory::class.java)
     val id = socket.generateId()
-    callTypedMethod(id, roomHistoryMethod(id, roomId, limit), adapter, callback)
+    callTypedMethod(id, roomHistoryMethod(id, roomId, latestTime, limit), adapter, callback)
 }
 
 fun RocketChatClient.sendMessage(messageId: String, roomId: String, text: String, fields: String?, callback: MethodCallback<Message>) {
